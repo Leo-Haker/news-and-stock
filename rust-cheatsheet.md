@@ -3,11 +3,20 @@
 ## Cargo (projektverktyget)
 
 ```bash
-cargo new namn        # nytt projekt
-cargo build            # kompilera
-cargo run              # kompilera + kör
-cargo check            # snabb felkontroll utan att bygga binär
-cargo add crate_namn   # lägg till ett beroende (nyare cargo-versioner)
+cargo new namn          # nytt projekt
+cargo build              # kompilera
+cargo run                # kompilera + kör
+cargo check              # snabb felkontroll utan att bygga binär
+cargo add crate_namn     # lägg till ett beroende
+cargo add crate --features x   # lägg till med specifik feature
+cargo remove crate_namn  # ta bort ett beroende
+cargo update -p crate --precise 1.2.3   # nedgradera/lås en specifik version
+cargo fmt                # formatera all kod enligt Rusts standardstil
+cargo clippy              # linter — hittar buggar och icke-idiomatisk kod fmt inte fångar
+cargo test                # kör tester (funktioner taggade #[test])
+cargo doc --open          # generera och öppna dokumentation från dina /// -kommentarer
+cargo install --path .    # bygg en optimerad binär och installera den globalt (t.ex. ~/.cargo/bin)
+cargo clean               # rensa build-artefakter (target/), t.ex. om något känns trasigt
 ```
 
 `Cargo.toml` = projektets manifest (beroenden, metadata).

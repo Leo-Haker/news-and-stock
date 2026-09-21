@@ -1,5 +1,9 @@
 ### AI-Generated Readme -fix 
 
+// https://www.nordnet.se/aktier/inspiration/listor/omx-stockholm-30
+// https://crates.io/crates/yahoo_finance_api
+
+
 # koll
 
 A terminal application, written in Rust, for browsing Swedish news via SVT's Text-TV service.
