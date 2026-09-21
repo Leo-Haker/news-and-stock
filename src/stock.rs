@@ -101,7 +101,7 @@ async fn get_stock_info(provider: &YahooConnector, ticker: &str) -> Option<Stock
 fn print_header() {
     println!("{:=^90}", " OMX30 ");
     println!(
-        "{}{:<10} {:>8} {:>8} {:>8} {:>8}{}",
+        "{}{:<12} {:>8} {:>8} {:>8} {:>8}{}",
         BOLD, "Aktie", "Pris", "Dagens", "Månadens", "Årets", RESET
     );
     println!("{}", "─".repeat(50));
@@ -131,8 +131,10 @@ fn print_stock(
 /// Formats a percentage value with a forced sign and ANSI color
 /// (green for >= 0, red for negative)
 fn colorize(value: f64) -> String {
+    let plain = format!("{:+.1}%", value);      
+    let padded = format!("{:>8}", plain);          
     let color = if value >= 0.0 { "\x1b[32m" } else { "\x1b[31m" };
-    format!("{}{:+.1}%\x1b[0m", color, value)
+    format!("{}{}\x1b[0m", color, padded)
 }
 
 /// Percentage change from `start` to `end`, relative to `start`.
