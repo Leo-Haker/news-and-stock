@@ -30,7 +30,7 @@ pub fn add_page_nbrs(page_nbrs: &mut HashSet<u32>, content: &str) {
             }
         }
     }
-}
+} 
 
 pub fn is_valid_page_number(word: &str) -> Option<u32> {
     //
