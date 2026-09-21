@@ -8,8 +8,8 @@ use stock::stock;
 
 use std::collections::HashSet;
 
-const START_URL_PAGE_NBR: u32 = 101;
-const INPUT_MESSAGE: &str = " Starsida: 101, Stänga: q eller quit, Börs: stock\n Sida eller börs: ";
+const START_URL_PAGE_NBR: u32 = 100;
+const INPUT_MESSAGE: &str = " Starsida: 100, Stänga: q eller quit, Börs: stock\n Sida eller börs: ";
 const WRONG_INPUT: &str = "Fel input - enbart tal, ex 106";
 
 // Rust has no built-in way to run async code, just the syntax.
@@ -21,7 +21,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut starting_page: String = get_page(START_URL_PAGE_NBR).await?;
     println!("{}", starting_page);
     print_info();
-
     add_page_nbrs(&mut page_nbrs, &starting_page);
 
     loop {
