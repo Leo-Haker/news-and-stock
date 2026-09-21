@@ -3,21 +3,20 @@ use std::io::{self, Write};
 
 use crate::pages::is_valid_page_number;
 
-static INPUT_MESSAGE: &str = " Starsida: 101, Stänga: q eller quit \n  Ange sidnummer: ";
+
 
 
 pub enum UserInput {
     Page(u32),
     Quit,
     Invalid,
+    Stock,
 }
 
 //@return UserInput
 //If Crtl + D, "q" or "quit" return Quit
 //Controlls if input correct, returns Page(nbr) or Invalid
 pub fn get_input() -> UserInput {
-    println!("");
-    println!("{}",INPUT_MESSAGE);
 
     if io::stdout().flush().is_err() {
         return UserInput::Invalid;
@@ -34,6 +33,10 @@ pub fn get_input() -> UserInput {
 
     if trimmed.eq("q") || trimmed.eq("quit") {
         return UserInput::Quit
+    }
+
+    if trimmed.eq("stock") {
+        return UserInput::Stock
     }
 
     match is_valid_page_number(&trimmed) {
