@@ -4,7 +4,7 @@ mod stock;
 
 use input::{UserInput, get_input};
 use pages::{add_page_nbrs, get_page, page_exist, page_has_changed};
-use stock::stock;
+use stock::print_stocks_and_funds;
 
 use std::collections::HashSet;
 
@@ -36,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             UserInput::Quit => break,
             UserInput::Invalid => println!("{}", WRONG_INPUT),
             UserInput::Stock => {
-                stock().await;
+                print_stocks_and_funds().await;
                 print_info();
             }
 
@@ -61,3 +61,4 @@ fn print_info() {
     println!();
     println!("{}", INPUT_MESSAGE);
 }
+
