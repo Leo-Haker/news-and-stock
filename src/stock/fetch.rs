@@ -1,57 +1,98 @@
-use time:: OffsetDateTime;
+use futures::future::join_all;
+use time::OffsetDateTime;
 use yahoo_finance_api::YahooConnector;
 
-
-use super::data::{TRADING_DAYS_PER_MONTH, TRADING_DAYS_PER_YEAR, StockRow, Fund};
-
+use super::data::{Fund, StockRow, TRADING_DAYS_PER_MONTH, TRADING_DAYS_PER_YEAR};
 
 /// Fetches and prints funds each with current price and daily/monthly/yearly/portfolio-start change.
 /// Skips (and reports) any ticker that fails to fetch.
-pub async fn fetch_funds(provider: &YahooConnector, funds: &[Fund], start: OffsetDateTime, end: OffsetDateTime) -> Vec<StockRow>{
+pub async fn fetch_funds(
+    provider: &YahooConnector,
+    funds: &[Fund],
+    start: OffsetDateTime,
+    end: OffsetDateTime,
+) -> Vec<StockRow> {
     let mut portfolio: Vec<(StockRow, &Fund)> = Vec::new();
-    let mut stocks:  Vec<StockRow> = Vec::new();
-    let portfolio_stockrow: StockRow;
-
+    let mut stocks: Vec<StockRow> = Vec::new();
+    let mut tickers = Vec::new();
 
     for fund in funds {
-        let stock = get_data(provider, fund.ticker, start, end).await;
-        if let Some(stock) =  stock {
-            stocks.push(set_fund_name_in_stock_row(fund, &stock));
-            portfolio.push((stock, fund));
-        } else {
-            println!("Kunde inte hämta data för {}", fund.name)
+        tickers.push(fund.ticker);
+    }
+
+    let stock_rows = get_stock_rows(provider, &tickers, start, end).await;
+
+    for (i, result) in stock_rows.into_iter().enumerate() {
+        match result {
+            Some(stock) => {
+                portfolio.push((stock.clone(), &funds[i]));
+                stocks.push(set_fund_name_in_stock_row(&funds[i], &stock));
+            }
+            None => println!("Kunde inte hämta data för {}", funds[i].name),
         }
     }
 
     let (daily, monthly, yearly, total) = calculate_portfolio_change(&portfolio);
-    portfolio_stockrow = StockRow{name:"Portfolio".to_string(),price: None, daily_change: daily, monthly_change: monthly, yearly_change: yearly, start_change: total };
+    let portfolio_stockrow = StockRow {
+        name: "Portfolio".to_string(),
+        price: None,
+        daily_change: daily,
+        monthly_change: monthly,
+        yearly_change: yearly,
+        start_change: total,
+    };
     stocks.push(portfolio_stockrow);
 
     stocks
 }
 
-
-
 /// Fetches and prints stocks each with current price and daily/monthly/yearly/portfolio-start change.
 /// Skips (and reports) any ticker that fails to fetch.
-pub async fn fetch_stocks(provider: &YahooConnector, tickers: &[&str], start: OffsetDateTime, end: OffsetDateTime) -> Vec<StockRow> {
-    let mut stocks:  Vec<StockRow> = Vec::new();
-    for ticker in tickers {
-        let stock = get_data(provider, ticker, start, end).await;
-        if let Some(stock) = stock {
-            stocks.push(stock);
-        } else {
-            println!("Kunde inte hämta data för {}", ticker)
+pub async fn fetch_stocks(
+    provider: &YahooConnector,
+    tickers: &[&str],
+    start: OffsetDateTime,
+    end: OffsetDateTime,
+) -> Vec<StockRow> {
+    let stock_rows = get_stock_rows(provider, tickers, start, end).await;
+
+    let mut stocks: Vec<StockRow> = Vec::new();
+    for (i, result) in stock_rows.into_iter().enumerate() {
+        match result {
+            Some(stock) => stocks.push(stock),
+            None => println!("Kunde inte hämta data för {}", tickers[i]),
         }
     }
-    stocks
 
+    stocks
+}
+
+/// Convert tickets into StockRows
+/// Creates all futures
+/// Fetches all futures at the same time - keeps the inital order
+async fn get_stock_rows(
+    provider: &YahooConnector,
+    tickers: &[&str],
+    start: OffsetDateTime,
+    end: OffsetDateTime,
+) -> Vec<Option<StockRow>> {
+    let mut futures = Vec::new();
+    for ticker in tickers {
+        futures.push(get_data(provider, ticker, start, end));
+    }
+
+    join_all(futures).await
 }
 
 /// Fetches one year of daily quotes for `ticker` and computes price
 /// changes relative to yesterday, ~1 month ago, ~1 year ago and ~start of portfolio.
 /// Returns `None` if the fetch fails or fewer than 2 data points exist.
-async fn get_data(provider: &YahooConnector, ticker: &str, start: OffsetDateTime, end: OffsetDateTime) -> Option<StockRow> {
+async fn get_data(
+    provider: &YahooConnector,
+    ticker: &str,
+    start: OffsetDateTime,
+    end: OffsetDateTime,
+) -> Option<StockRow> {
     let data = provider
         .get_quote_history(ticker, start, end)
         .await
@@ -93,7 +134,7 @@ fn percentage(start: f64, end: f64) -> f64 {
 }
 
 /// Calculates total change by fund weigth in a portfolio
-fn calculate_portfolio_change(stocks: &[(StockRow, &Fund)]) -> (f64,f64,f64,f64) {
+fn calculate_portfolio_change(stocks: &[(StockRow, &Fund)]) -> (f64, f64, f64, f64) {
     let mut daily = 0.0;
     let mut monthly = 0.0;
     let mut yearly = 0.0;

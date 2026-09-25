@@ -1,4 +1,3 @@
-
 use once_cell::sync::Lazy;
 use time::{Date, Month, OffsetDateTime};
 
@@ -11,6 +10,7 @@ pub const TRADING_DAYS_PER_YEAR: usize = 252;
 
 /// A single row of stock data ready to be printed: current price and
 /// percentage change over three time horizons.
+#[derive(Clone)]
 pub struct StockRow {
     pub name: String,
     pub price: Option<f64>,
@@ -22,11 +22,9 @@ pub struct StockRow {
 
 pub struct Fund {
     pub ticker: &'static str,
-    pub name:  &'static str,
+    pub name: &'static str,
     pub weigth: f64,
 }
-
-
 
 ///Yahoo Finance tickers for Global coverage
 pub const GLOBAL_FUNDS: &[Fund] = &[
@@ -35,12 +33,12 @@ pub const GLOBAL_FUNDS: &[Fund] = &[
         name: "DNB Global Indeks S",
         weigth: 0.85,
     },
-    Fund{
+    Fund {
         ticker: "0P0001H4TL.ST",
         name: "Avanza Emergin Markets",
         weigth: 0.15,
     },
-]; 
+];
 
 pub static GLOBAL_START: Lazy<OffsetDateTime> = Lazy::new(|| {
     Date::from_calendar_date(2025, Month::August, 25)
@@ -51,17 +49,17 @@ pub static GLOBAL_START: Lazy<OffsetDateTime> = Lazy::new(|| {
 
 ///Yahoo Finance tickers for Lysa Global
 pub const LYSA_FUNDS: &[Fund] = &[
-    Fund{
+    Fund {
         ticker: "0P00019MOJ.ST",
         name: "Lysa Global", //Lysa Global Equity Broad C
         weigth: 0.7669,
     },
-    Fund{
+    Fund {
         ticker: "0P0001UE4H.ST",
         name: "Lysa Emerging Markets", //Lysa Emerging Markets Equity Broad B
         weigth: 0.1290,
     },
-    Fund{
+    Fund {
         ticker: "0P0001UE4I.ST",
         name: "Lysa Global Small Cap", //Lysa Global Small Cap Equity Broad B
         weigth: 0.1041,

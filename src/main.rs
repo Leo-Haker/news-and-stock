@@ -61,4 +61,3 @@ fn print_info() {
     println!();
     println!("{}", INPUT_MESSAGE);
 }
-
