@@ -1,6 +1,6 @@
 # News and Stocks
 
-A terminal app for browsing SVT Text-TV and OMX30 stock prices, right from the command line.
+A terminal app for browsing SVT Text-TV and stock prices for the OMX30, Lysa Global, and an example global portfolio, right from the command line.
 
 ![News and Stock demo](demo.gif)
 
