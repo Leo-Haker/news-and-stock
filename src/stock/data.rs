@@ -40,12 +40,7 @@ pub const GLOBAL_FUNDS: &[Fund] = &[
     },
 ];
 
-pub static GLOBAL_START: Lazy<OffsetDateTime> = Lazy::new(|| {
-    Date::from_calendar_date(2025, Month::August, 25)
-        .unwrap()
-        .midnight()
-        .assume_utc()
-});
+
 
 ///Yahoo Finance tickers for Lysa Global
 pub const LYSA_FUNDS: &[Fund] = &[
@@ -66,12 +61,7 @@ pub const LYSA_FUNDS: &[Fund] = &[
     },
 ];
 
-pub static LYSA_START: Lazy<OffsetDateTime> = Lazy::new(|| {
-    Date::from_calendar_date(2022, Month::June, 1)
-        .unwrap()
-        .midnight()
-        .assume_utc()
-});
+
 
 /// Yahoo Finance tickers for all 30 constituents of the OMXS30 index.
 /// Verified against Nordnet's list (as of 2026-09-03):

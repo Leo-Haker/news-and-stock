@@ -3,7 +3,7 @@ use yahoo_finance_api::{self as yahoo};
 
 use super::fetch::{fetch_funds, fetch_stocks};
 use crate::stock::data::{
-    BOLD, GLOBAL_FUNDS, GLOBAL_START, LYSA_FUNDS, LYSA_START, OMX30_TICKERS, RESET, StockRow,
+    BOLD, GLOBAL_FUNDS, LYSA_FUNDS, OMX30_TICKERS, RESET, StockRow,
 };
 
 /// Prints the full report: Global funds, Lysa funds, and OMX30 stocks,
@@ -13,19 +13,18 @@ pub async fn print_stocks_and_funds() {
     let provider = yahoo::YahooConnector::new().unwrap();
     let now = OffsetDateTime::now_utc();
     let five_years_ago = now - Duration::days(5 * 365 + 1);
-    let global_start = *GLOBAL_START;
-    let lysa_start = *LYSA_START;
+
 
     let (omx30, lysa, global) = tokio::join!(
         fetch_stocks(&provider, OMX30_TICKERS, five_years_ago, now),
-        fetch_funds(&provider, LYSA_FUNDS, lysa_start, now),
-        fetch_funds(&provider, GLOBAL_FUNDS, global_start, now)
+        fetch_funds(&provider, LYSA_FUNDS, five_years_ago, now),
+        fetch_funds(&provider, GLOBAL_FUNDS, five_years_ago, now)
     );
 
-    print_header("Global", global_start);
+    print_header("Global", five_years_ago);
     print_stock(&global);
 
-    print_header("Lysa", lysa_start);
+    print_header("Lysa", five_years_ago);
     print_stock(&lysa);
 
     print_header("OMX30", five_years_ago);
